@@ -22,7 +22,7 @@ for item in clipkit templates; do
 done
 
 # 单文件
-for f in SKILL.md INSTRUCTIONS.md PORTABILITY.md manifest.json pyproject.toml \
+for f in SKILL.md INSTRUCTIONS.md PORTABILITY.md PROVENANCE.md manifest.json pyproject.toml \
          selftest.py gui.py start.sh 启动器.py 启动.bat LICENSE; do
   if [ -e "$SRC/$f" ]; then cp -f "$SRC/$f" "$HERE/$f"; echo "  -> $f"; fi
 done
