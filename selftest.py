@@ -6,6 +6,11 @@
 """
 import subprocess, sys, os, json, shutil, time, socket, urllib.request, urllib.parse
 
+# 自测本身必须零依赖可跑：重依赖缺失时，相关断言改为「按设计跳过」
+import importlib.util as _ilu
+HAS_NUMPY = _ilu.find_spec("numpy") is not None
+HAS_PIL = _ilu.find_spec("PIL") is not None
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 PY = sys.executable
 TMP = os.path.join(os.path.dirname(HERE), "_clipkit_selftest")
@@ -82,11 +87,21 @@ def main():
     check("demo 成功", rc == 0 and "造好演示数据" in out)
     D = os.path.join(TMP, "demo-proj")
     for f, label in (("clipkit.json", "配置"), (".clipkit/index/index.csv", "索引"),
-                     (".clipkit/index/vectors.npy", "向量"), (".clipkit/tags/tags.jsonl", "描述"),
+                     (".clipkit/tags/tags.jsonl", "描述"),
                      (".clipkit/transcripts/transcripts.jsonl", "台词")):
         check("生成" + label, os.path.isfile(os.path.join(D, f)))
-    n = len([x for x in os.listdir(os.path.join(D, "素材帧")) if x.endswith(".jpg")])
-    check("生成帧图", n >= 72, "%d 张" % n)
+    # 向量文件：有 numpy 才生成
+    vec = os.path.isfile(os.path.join(D, ".clipkit/index/vectors.npy"))
+    if HAS_NUMPY:
+        check("生成向量（有 numpy）", vec)
+    else:
+        check("生成向量（无 numpy 时按设计跳过）", not vec)
+    tdir = os.path.join(D, "素材帧")
+    n = len([x for x in os.listdir(tdir) if x.endswith(".jpg")]) if os.path.isdir(tdir) else 0
+    if HAS_PIL:
+        check("生成帧图（有 Pillow）", n >= 72, "%d 张" % n)
+    else:
+        check("生成帧图（无 Pillow 时按设计跳过）", n == 0, "%d 张" % n)
 
     print("== doctor / query ==")
     rc, out = run(["doctor"], cwd=D)
@@ -144,7 +159,9 @@ def main():
         d = json.loads(b2.decode("utf-8"))
         check("画面缓存路径", st == 200 and len(d["results"]) == 3)
         st, b2 = get(base + "/frames/DEMO_0001_f1.jpg")
-        check("帧图可访问", st == 200 and len(b2) > 500)
+        # 没装 Pillow 时 demo 不生成图，服务会返回占位 SVG —— 两种都算通过
+        check("帧图可访问（缺图时返回占位图）", st == 200 and len(b2) > 50,
+              "%d 字节" % len(b2))
     proc.terminate()
     time.sleep(0.3)
     lf.close()

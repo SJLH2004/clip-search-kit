@@ -13,6 +13,7 @@ class Encoder(object):
         self.device = device
         self.model = None
         self.proc = None
+        self._dim = None
         self.lock = None
         self.error = ""
 
@@ -37,6 +38,18 @@ class Encoder(object):
         self.model = ChineseCLIPModel.from_pretrained(self.model_name).to(self.device).eval()
         self.proc = ChineseCLIPProcessor.from_pretrained(self.model_name)
         return True
+
+    def dim(self):
+        """模型自身的文本向量维度；探测失败返回 None。不加载权重。"""
+        if self._dim is not None:
+            return self._dim
+        try:
+            from transformers import ChineseCLIPConfig
+            cfg = ChineseCLIPConfig.from_pretrained(self.model_name)
+            self._dim = int(getattr(cfg, "projection_dim", 0) or 0) or None
+        except Exception:
+            self._dim = None
+        return self._dim
 
     @staticmethod
     def _pick(o):
@@ -77,13 +90,26 @@ class Encoder(object):
 
 
 class Searcher(object):
-    def __init__(self, store, encoder=None):
+    def __init__(self, store, encoder=None, module_dims=None):
         self.st = store
         self.enc = encoder
+        # 本项目索引的向量维度（demo 会写入 module_dims 供兼容性检查）
+        self.module_dims = module_dims
+
+    @property
+    def dims_ok(self):
+        """索引向量维度与模型输出是否一致。不一致就不能做语义检索。"""
+        if self.st.vnorm is None:
+            return False
+        if self.enc is None or not self.enc.available():
+            return False
+        want = getattr(self.st.vnorm, "shape", (0, 0))[1]
+        got = self.enc.dim()
+        return bool(want) and (got is None or got == want)
 
     @property
     def semantic(self):
-        return self.st.vnorm is not None and self.enc is not None and self.enc.available()
+        return self.dims_ok
 
     def subs(self, q, top=20):
         """台词检索：关键词优先，语义兜底"""
@@ -145,6 +171,12 @@ class Searcher(object):
         else:
             tv = None
 
+        if tv is not None and getattr(self.st.vnorm, "shape", (0, 0))[1] != len(tv):
+            # 向量维度与模型输出不一致（例如 demo 的合成向量 vs 真 CLIP 512 维），
+            # 直接降级为关键词检索，而不是让 matmul 抛异常把整个查询搞崩
+            meta["note"] = "向量维度不匹配（%d vs %d），已降级为关键词检索" % (
+                getattr(self.st.vnorm, "shape", (0, 0))[1], len(tv))
+            tv = None
         if tv is not None:
             meta["mode"] = "hybrid"
             sims = self.st.vnorm @ tv

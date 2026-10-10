@@ -33,6 +33,13 @@ PAGE = _read("app.html")
 CSS = _read("app.css")
 JS = _read("app.js")
 
+PLACEHOLDER_SVG = (
+    '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180">'
+    '<rect width="320" height="180" fill="#e9edf2"/>'
+    '<text x="160" y="96" font-size="13" fill="#9aa5b1" text-anchor="middle" '
+    'font-family="sans-serif">无预览图</text></svg>'
+).encode("utf-8")
+
 IMG_CHIPS = ["手部特写", "抱拳行礼", "打沙袋 出拳", "师父教学 讲解",
              "一个人独自练拳", "两个人对练 推手", "武馆室内 训练场", "户外广场 晨练",
              "人脸特写 表情", "航拍 城市 俯瞰", "拳谱 纸张文字", "兵器 棍 刀",
@@ -48,8 +55,15 @@ class App(object):
         self.device = "关键词模式"
         if semantic:
             from .search import Encoder
-            self.enc = Encoder(cfg.data.get("clip_model"))
-            if self.enc.available() and self.st.vnorm is not None:
+            cand = Encoder(cfg.data.get("clip_model"))
+            want = self.st.vnorm.shape[1] if self.st.vnorm is not None else 0
+            got = cand.dim() if want else None
+            if want and got is not None and got != want:
+                print("[启动] 索引向量 %d 维 != 模型 %d 维，走关键词模式（省去加载模型）" % (want, got), flush=True)
+                self.enc = None
+            else:
+                self.enc = cand
+            if self.enc is not None and self.enc.available() and self.st.vnorm is not None:
                 print("[启动] 加载 Chinese-CLIP …", flush=True)
                 t0 = time.time()
                 if self.enc.load():
@@ -331,7 +345,15 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         if path.startswith("/frames/"):
-            self._file(app.frame_file(os.path.basename(path[len("/frames/"):])))
+            name = os.path.basename(path[len("/frames/"):])
+            fp = app.frame_file(name)
+            if not fp or not os.path.isfile(fp):
+                # 帧图缺失（例如没装 Pillow 时 demo 不生成占位图）也返回一张灰图，
+                # 免得界面上一排破图标 —— 检索本身不依赖图片
+                self._send(200, "image/svg+xml; charset=utf-8", PLACEHOLDER_SVG,
+                           {"Cache-Control": "public, max-age=3600"})
+                return
+            self._file(fp)
             return
 
         if path.startswith("/media/"):
