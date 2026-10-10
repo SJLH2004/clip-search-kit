@@ -514,7 +514,14 @@ def cmd_query(args):
     st = S.Store(cfg, load_vectors=C.has_module("numpy"))
     enc = None
     if not args.no_semantic and C.has_module("torch"):
-        enc = Encoder(cfg.data.get("clip_model"))
+        cand = Encoder(cfg.data.get("clip_model"))
+        want = st.vectors.shape[1] if getattr(st, "vectors", None) is not None else 0
+        got = cand.dim() if want else None
+        # 维度对不上（比如 demo 的合成向量）就别白加载几百 MB 模型
+        if want and got is not None and got != want:
+            print("[提示] 索引向量 %d 维，模型输出 %d 维，跳过模型加载，改走关键词检索" % (want, got))
+        else:
+            enc = cand
     srch = Searcher(st, enc)
 
     if args.subs:
