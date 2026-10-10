@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "clipkit"
+version = "1.0.0"
+description = "素材语义检索工具箱：把一目录视频变成可说人话检索的本地服务"
+readme = "SKILL.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+basic = ["numpy", "pillow"]
+semantic = ["numpy", "pillow", "torch", "transformers"]
+full = ["numpy", "pillow", "torch", "transformers", "faster-whisper"]
+
+[project.scripts]
+clipkit = "clipkit.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/<you>/clip-search-kit"
+
+[tool.setuptools]
+packages = ["clipkit"]
+
+# 界面模板有两份等价副本：仓库根 templates/（方便编辑）与 clipkit/templates/（打包进 wheel）。
+# 它们必须逐字节一致 —— selftest.py 会自动比对，漂移就报错。改完请同步（见 CONTRIBUTING.md）。
+[tool.setuptools.package-data]
+clipkit = ["templates/*.html", "templates/*.css", "templates/*.js"]
+

@@ -1,0 +1,72 @@
+{
+  "name": "clip-search-kit",
+  "version": "1.0.0",
+  "summary": "把一目录视频素材变成可说人话检索的本地语义检索服务",
+  "summary_en": "Turn a folder of video footage into a local Chinese semantic search service",
+  "kind": "skill+cli",
+  "entry": {
+    "skill": "SKILL.md",
+    "cli": "python -m clipkit",
+    "gui": "启动器.py",
+    "selftest": "selftest.py"
+  },
+  "requires": {
+    "mandatory": [
+      {
+        "name": "python",
+        "version": ">=3.9"
+      }
+    ],
+    "recommended": [
+      {
+        "name": "numpy",
+        "why": "向量检索"
+      },
+      {
+        "name": "pillow",
+        "why": "抽帧与图片"
+      },
+      {
+        "name": "ffmpeg",
+        "why": "抽帧、抽音轨"
+      }
+    ],
+    "optional": [
+      {
+        "name": "torch",
+        "why": "画面语义检索"
+      },
+      {
+        "name": "transformers",
+        "why": "中文-CLIP"
+      },
+      {
+        "name": "faster-whisper",
+        "why": "本地台词转写"
+      },
+      {
+        "name": "tkinter",
+        "why": "图形面板（缺则自动降级为控制台菜单）"
+      }
+    ]
+  },
+  "install_targets": {
+    "dsh": "把本目录放到所支持的 skills 目录下（见 PORTABILITY.md）",
+    "workbuddy": "~/.workbuddy/skills/clip-search-kit/",
+    "claude_skills": "~/.claude/skills/clip-search-kit/",
+    "openai_codex_or_cursor": "把 INSTRUCTIONS.md 内容并入 AGENTS.md / 规则文件",
+    "any_agent": "agent 能读文件 + 执行 shell 即可（见 INSTRUCTIONS.md）"
+  },
+  "files": [
+    "SKILL.md",
+    "INSTRUCTIONS.md",
+    "PORTABILITY.md",
+    "manifest.json",
+    "clipkit/",
+    "templates/",
+    "启动器.py",
+    "gui.py",
+    "selftest.py",
+    "start.sh"
+  ]
+}

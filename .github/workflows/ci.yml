@@ -1,0 +1,37 @@
+name: selftest
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.9", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      # 首要目标：零第三方依赖也能完整跑通（这是新用户的第一体验）
+      - name: selftest（无第三方依赖）
+        run: python selftest.py
+
+      - name: 安装基础依赖后再跑一次
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy pillow
+          python selftest.py
+
+      - name: 验证 pip 可安装
+        run: |
+          python -m pip install --user --no-deps .
+          python -m clipkit --version
