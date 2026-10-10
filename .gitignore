@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+.venv/
+venv/
+
+# clipkit 运行产物（素材相关，体积大，不要提交）
+clipkit.json
+.clipkit/
+素材帧/
+素材帧_多帧/
+*_demo/
+my-demo/
+
+# 自测临时目录
+_clipkit_selftest/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log

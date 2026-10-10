@@ -1,0 +1,30 @@
+<header>
+  <h1>素材语义检索 <span class="badge">clipkit</span></h1>
+  <div class="sub">__MODEL__ · <b>__DEVICE__</b> · 画面索引 <b>__NFRAMES__</b> 帧 / <b>__NCLIPS__</b> 条素材 · VLM 描述 <b>__NTAGS__</b> 条 · 台词库 <b>__NSUBS__</b> 条 · 纯本地运行，不上传</div>
+  <div class="tabs">
+    <button class="tab chip on" id="tabImg">画面检索</button>
+    <button class="tab chip" id="tabSub">台词检索</button>
+    <button class="tab chip" id="tabTl">时间线</button>
+  </div>
+  <div class="bar">
+    <input type="text" id="q" placeholder="用中文描述你想要的画面，例如：手部特写 缠绷带" autocomplete="off">
+    <select id="top"></select>
+    <button id="go">检索</button>
+    <button class="ghost" id="raw" title="同一素材保留多帧（能看到动作的连续变化）">同素材多帧</button>
+    <button class="ghost" id="help" title="快捷键与说明">?</button>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="chips" id="cats"></div>
+  <div class="row" id="histRow"></div>
+  <div id="tipBox" style="display:none;margin-top:11px;padding:10px 13px;background:#fff8e6;border-left:3px solid #e0a800;border-radius:4px;font-size:12px;color:#5c4b1a;line-height:1.7"></div>
+</header>
+<main>
+  <div class="meta" id="meta"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty">输入中文描述后回车，结果即时返回（无需重跑脚本）</div>
+</main>
+<footer>
+  服务端：<code>clipkit serve</code>　·　快捷键 <kbd>Enter</kbd> 检索　<kbd>/</kbd> 聚焦输入框　<kbd>Esc</kbd> 清空
+  　<kbd>←</kbd><kbd>→</kbd> 移动选中　<kbd>Enter</kbd> 展开　·　健康检查 <code>/api/health</code>
+  　·　机器只负责排序，<b>哪条真的可用必须你肉眼核对</b>
+</footer>

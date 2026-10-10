@@ -1,0 +1,18 @@
+# 统一行尾：文本文件入库用 LF，检出时按平台转换
+* text=auto
+
+# Shell 脚本必须 LF，否则在 macOS/Linux 上会因为 CRLF 无法执行
+*.sh text eol=lf
+
+# Windows 批处理必须 CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制
+*.png binary
+*.jpg binary
+*.npy binary
+*.7z binary
+
+# 让 GitHub 语言统计正确识别这是一个 Python 项目
+*.py linguist-language=Python
