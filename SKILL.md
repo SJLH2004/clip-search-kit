@@ -12,7 +12,7 @@ description_en: >-
   footage by content rather than filename, build a searchable index of clips,
   locate a specific shot's position across source files, or turn spoken dialogue
   into a searchable subtitle库.
-version: 1.0.0
+version: 1.0.1
 author: lead
 level: personal
 ---
