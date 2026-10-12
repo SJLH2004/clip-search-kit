@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "clipkit"
-version = "1.0.0"
+version = "1.0.1"
 description = "素材语义检索工具箱：把一目录视频变成可说人话检索的本地服务"
 readme = "SKILL.md"
 requires-python = ">=3.9"

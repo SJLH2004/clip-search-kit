@@ -1,6 +1,6 @@
 {
   "name": "clip-search-kit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "summary": "把一目录视频素材变成可说人话检索的本地语义检索服务",
   "summary_en": "Turn a folder of video footage into a local Chinese semantic search service",
   "kind": "skill+cli",

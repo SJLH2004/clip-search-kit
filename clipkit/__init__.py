@@ -5,5 +5,5 @@
 所有路径都来自 clipkit.json，代码里没有任何硬编码路径。
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __all__ = ["__version__"]
