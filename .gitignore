@@ -25,3 +25,6 @@ _clipkit_selftest/
 .DS_Store
 Thumbs.db
 *.log
+
+# 本机推送辅助脚本（含本地绝对路径，不入库）
+完成推送.*
