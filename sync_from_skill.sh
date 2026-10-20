@@ -30,9 +30,9 @@ done
 # 清理缓存
 find "$HERE" -type d -name __pycache__ -prune -exec rm -rf {} + 2>/dev/null || true
 
-# 仓库专属文件（不从技能包覆盖）：README / CHANGELOG / CONTRIBUTING / PUBLISH / .github / docs / install.sh
+# 仓库专属文件（不从技能包覆盖）：README / CHANGELOG / CONTRIBUTING / .github / docs / install.sh
 echo ""
-echo "保留仓库专属：README.md CHANGELOG.md CONTRIBUTING.md PUBLISH.md .github/ docs/ install.sh"
+echo "保留仓库专属：README.md CHANGELOG.md CONTRIBUTING.md .github/ docs/ install.sh"
 echo ""
 echo "同步完成。验证："
 echo "    cd $HERE && python selftest.py"
